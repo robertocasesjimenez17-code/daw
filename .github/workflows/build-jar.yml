@@ -1,0 +1,45 @@
+name: Build Executable JAR from dev branch
+
+on:
+  push:
+    branches:
+      - dev
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout dev branch
+        uses: actions/checkout@v4
+        with:
+          ref: dev
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Compile Java files
+        run: |
+          mkdir -p build/classes
+          javac -d build/classes $(find src -name "*.java")
+
+      - name: Create manifest file
+        run: |
+          mkdir -p build
+          echo "Main-Class: com.example.Main" > build/manifest.txt
+          echo "" >> build/manifest.txt
+
+      - name: Package into executable JAR
+        run: |
+          mkdir -p build/jar
+          jar cfm build/jar/app.jar build/manifest.txt -C build/classes .
+
+      - name: Upload JAR artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: executable-jar
+          path: build/jar/app.jar
