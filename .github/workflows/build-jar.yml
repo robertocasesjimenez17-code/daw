@@ -3,7 +3,7 @@
 # y generar un archivo JAR ejecutable desde la rama 'dev'.
 # ===========================================================
 
-name: Build Executable JAR from dev branch  # Nombre visible en la pestaña "Actions"
+name: Código a JAR  # Nombre visible en la pestaña "Actions"
 
 on:
   push:
