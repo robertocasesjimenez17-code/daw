@@ -1,45 +1,68 @@
-name: Build Executable JAR from dev branch
+# ===========================================================
+# Flujo de trabajo de GitHub Actions para compilar archivos Java
+# y generar un archivo JAR ejecutable desde la rama 'dev'.
+# ===========================================================
+
+name: Build Executable JAR from dev branch  # Nombre visible en la pestaña "Actions"
 
 on:
   push:
     branches:
-      - dev
-  workflow_dispatch:
+      - dev      # Se ejecuta automáticamente cuando se hace push a la rama 'dev'
+  workflow_dispatch:  # Permite ejecutarlo manualmente desde GitHub
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  # Sistema operativo del entorno en el que se va a realizar la acción
 
     steps:
+      # -----------------------------------------------
+      # Descargar el código fuente de la rama 'dev'
+      # -----------------------------------------------
       - name: Checkout dev branch
         uses: actions/checkout@v4
         with:
           ref: dev
 
+      # -----------------------------------------------
+      # Configurar el entorno de Java (JDK 17)
+      # -----------------------------------------------
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
-          distribution: temurin
-          java-version: 17
+          distribution: temurin   # Distribución del JDK (OpenJDK mantenido por Eclipse Temurin)
+          java-version: 17        # Versión de Java utilizada para la compilación
 
+      # -----------------------------------------------
+      # Compilar los archivos Java
+      # -----------------------------------------------
       - name: Compile Java files
         run: |
-          mkdir -p build/classes
-          javac -d build/classes $(find src -name "*.java")
+          mkdir -p build/classes             # Crear carpeta para archivos compilados
+          javac -d build/classes $(find src -name "*.java")  # Compilar todos los .java dentro de 'src'
 
+      # -----------------------------------------------
+      # Crear el archivo MANIFEST (define la clase principal)
+      # -----------------------------------------------
       - name: Create manifest file
         run: |
           mkdir -p build
-          echo "Main-Class: com.example.Main" > build/manifest.txt
-          echo "" >> build/manifest.txt
+          echo "Main-Class: com.example.Main" > build/manifest.txt  # Clase principal del programa
+          echo "" >> build/manifest.txt  # Línea vacía obligatoria al final del manifiesto
 
+      # -----------------------------------------------
+      # Empaquetar los .class en un archivo JAR ejecutable
+      # -----------------------------------------------
       - name: Package into executable JAR
         run: |
           mkdir -p build/jar
-          jar cfm build/jar/app.jar build/manifest.txt -C build/classes .
+          jar cfm build/jar/app.jar build/manifest.txt -C build/classes .  # Crear app.jar con el manifiesto
 
+      # -----------------------------------------------
+      # Subir el archivo JAR como artefacto descargable
+      # -----------------------------------------------
       - name: Upload JAR artifact
         uses: actions/upload-artifact@v4
         with:
-          name: executable-jar
-          path: build/jar/app.jar
+          name: executable-jar   # Nombre del artefacto en la pestaña "Actions"
+          path: build/jar/app.jar  # Ruta al archivo JAR generado
