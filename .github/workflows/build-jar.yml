@@ -19,7 +19,7 @@ jobs:
       # -----------------------------------------------
       # Descargar el código fuente de la rama 'dev'
       # -----------------------------------------------
-      - name: Checkout dev branch
+      - name: Descargar la rama
         uses: actions/checkout@v4
         with:
           ref: dev
@@ -38,7 +38,7 @@ jobs:
       # -----------------------------------------------
       - name: Compile Java files
         run: |
-          mkdir -p build/classes             # Crear carpeta para archivos compilados
+          mkdir -p build/classes            # Crear carpeta para archivos compilados
           javac -d build/classes $(find src -name "*.java")  # Compilar todos los .java dentro de 'src'
 
       # -----------------------------------------------
